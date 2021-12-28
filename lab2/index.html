@@ -1,0 +1,169 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Docker Basics</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid="Google Analytics ID"
+                  id="lab2"
+                  title="Docker Basics"
+                  environment="web"
+                  feedback-link="https://github.com/arunstiwari/docker-workshop-lab">
+    
+      <google-codelab-step label="Running Docker Containers" duration="7">
+        <h2 is-upgraded>Running Hello World Containers</h2>
+<ol type="1">
+<li>Execute the following command in the terminal</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker run hello-world 
+</code></pre>
+<ol type="1" start="2">
+<li>Next execute the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker ps 
+</code></pre>
+<ol type="1" start="3">
+<li>View the docker images in the local system using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker images 
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Managing Docker Containers" duration="0">
+        <h2 is-upgraded>Docker container Management basic Commands</h2>
+<ol type="1">
+<li>In the container journey, we require to pull, start, stop and remove the container from our environments</li>
+<li>Look at how to use the <code>docker pull</code> command which fetches the docker image from the docker repository</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker pull ubuntu:18.04 
+
+
+</code></pre>
+<ol type="1" start="3">
+<li>In the output one can see that Docker is downloading all the layers of the base image</li>
+<li>We can see the images on our local system using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker images 
+</code></pre>
+<ol type="1" start="6">
+<li>We can also inspect the image using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker inspect &lt;image_id&gt; 
+</code></pre>
+<ol type="1" start="7">
+<li>Now let us run the docker image using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker run -d ubuntu:18.04 
+</code></pre>
+<ol type="1" start="8">
+<li>Let us check the status of the container using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker ps -a  
+</code></pre>
+<ol type="1" start="9">
+<li>We can see that the container is <code>stopped and exited</code>. This is primarily because the primary process inside the container is <code>/bin/bash</code> which is a shell. <ol type="1">
+<li>Bash shell cannot run without being executed in an interactive mode since it expects text input and output from a user</li>
+</ol>
+</li>
+<li>Let&#39;s run the <code>docker run</code> command again in an interactive mode using the <code>-i -t</code>  flags</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker run -i -t -d --name ubuntu1 ubuntu:18.0.4
+</code></pre>
+<pre><code>1. -t flag is used to allocate a `psuedo-tty` handler to the container. Essentially `psuedo-tty` handler will link the `user&#39;s terminal` to the interactive bash shell running inside the container
+</code></pre>
+<ol type="1" start="12">
+<li>Execute the following command again to check the container status</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker ps -a
+</code></pre>
+<ol type="1" start="13">
+<li>Now we have got the container up and running, and we can run the commands inside this container using the <code>exec</code> command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker exec -it ubuntu1 /bin/bash 
+</code></pre>
+<ol type="1" start="14">
+<li>You are inside the container. We may have limited tools in this container as <code>container is supposed to be minimal in comparison to vm</code></li>
+<li>Let us create a file <code>hello-world.txt</code> with following content inside the container</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"># echo &#34;Hello World from ubuntu1&#34; &gt; hello-world.txt 
+</code></pre>
+<ol type="1" start="16">
+<li>Next exit out of the container by typing <code>exit</code> on the command prompt</li>
+<li>Let us view the <code>hello-world.txt</code> file without even entering the <code>container ubuntu1</code> using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker exec -it ubuntu1 cat hello-world.txt 
+</code></pre>
+<ol type="1" start="18">
+<li>Next let us create a second <code>ubuntu</code> container with name as <code>ubuntu2</code></li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker run -d -i -t --name ubuntu2 ubuntu:18.0.4
+</code></pre>
+<ol type="1" start="19">
+<li>Stop the <code>ubuntu2</code> container</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker stop ubuntu2 
+</code></pre>
+<ol type="1" start="20">
+<li>See the docker process status using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker ps -a
+</code></pre>
+<ol type="1" start="21">
+<li>Use the <code>docker start or docker restart</code> command to restart the container instance</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker start ubuntu2 
+</code></pre>
+<ol type="1" start="22">
+<li>Verify the container status using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker ps 
+</code></pre>
+<ol type="1" start="23">
+<li>Let us finally remove the container using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker stop ubuntu2
+$ docker rm &lt;container_name&gt; or &lt;container_id&gt;
+</code></pre>
+<ol type="1" start="24">
+<li>We can delete the docker image using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker rmi &lt;image_id&gt;
+</code></pre>
+<ol type="1" start="25">
+<li>To streamline the process of cleaning up of your environments, Docker provides a prune command that will automatically remove old containers and base images</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker system prune -fa 
+</code></pre>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>

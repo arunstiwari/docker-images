@@ -1,0 +1,26 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2021-12-28T17:36:00+05:30",
+  "id": "lab2",
+  "duration": 7,
+  "title": "Docker Basics",
+  "summary": "Docker Workshop",
+  "source": "lab2.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "codelab",
+    "markdown"
+  ],
+  "tags": [
+    "web"
+  ],
+  "feedback": "https://github.com/arunstiwari/docker-workshop-lab",
+  "ga": "Google Analytics ID",
+  "url": "lab2"
+}
