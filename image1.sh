@@ -103,6 +103,12 @@ fi
 sudo echo | openssl s_client -servername jenkins-prod.uk.fid-intl.com -connect jenkins-prod.uk.fid-intl.com:8443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > /home/ec2-user/certificate.crt
 keytoolpath=$(find /usr/lib/jvm/ -name keytool|head -1)
 echo $keytoolpath
-sudo $keytoolpath -import -keystore keytool -import -keystore
+sudo $keytoolpath -import -keystore keytool -import -keystore /etc/pki/ca-trust/extracted/java/cacerts -alias jenkins_prod -file /home/ec2-user/certificate.crt -storepaas changeit -noprompt
+sudo curl -o /home/ec2-user/agent.jar https://jenkins-prod.uk.fid-intl.com:8443/jnlpjars/agent.jar --insecure
+sudo chmod 755 /home/ec2-user/agent.jar
+sudo ls -latr /home/ec2-user
+
+sudo sh -c "echo sudo -u ec2-user 'nohup java -jar /home/ec2-user/agent.jar -jnlpUrl https://jenkins-prod.uk.fid-intl.com:8443/computer/${JenkinsSlaveNodeName}/slave-agent.jnlp -secret ${JenkinsSlaveSecret} -noCertificateCheck -workDir /home/ec2-user &' >> /etc/rc.d/rc.local"
+
 
 
