@@ -1,0 +1,12 @@
+FROM jenkins/inbound-agent:alpine as runtime
+ARG no_proxy=169.254,bitbucket.bip.uk.fid-intl.com
+ARG user=jenkins
+USER root
+RUN apk update all && apk add py-pip openjdk11-jdk jq git zip unzip curl maven coreutils openssl
+RUN pip install boto3 awscli && pip install --upgrade setuptools && pip install cfn-lint
+RUN apk add --no-cache bash && apk add --update sed
+RUN mkdir /.aws && chmod -R 777 /.aws && git config --global http.sslVerify false
+
+USER ${user}
+ENTRYPOINT ["/usr/local/bin/jenkins-agent"]
+

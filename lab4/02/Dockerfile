@@ -1,0 +1,22 @@
+# Start with alpine base image
+FROM alpine
+
+# Set labels
+LABEL maintainer=arunstiwari
+LABEL version=1.0
+
+RUN apk update
+RUN apk add wget curl
+
+RUN wget -O test.txt https://github.com/arunstiwari/aws-iot-chat-app/blob/master/README.md
+
+CMD mkdir /var/www/
+CMD mkdir /var/www/html/
+
+WORKDIR /var/www/html/
+
+COPY Dockerfile.tar.gz /tmp/
+RUN tar -zxvf /tmp/Dockerfile.tar.gz -C /var/www/html/
+RUN rm /tmp/Dockerfile.tar.gz
+
+RUN cat Dockerfile
