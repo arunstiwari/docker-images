@@ -1,0 +1,8 @@
+amazon-ecs:1.38
+configuration-as-code:1.55
+workflow-aggregator:2.6
+git-client:3.11.0
+git-server:1.10
+gradle:1.37.1
+blueocean:1.25.2
+docker-plugin:1.2.6

@@ -1,0 +1,760 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Dockerfile</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid="Google Analytics ID"
+                  id="lab3"
+                  title="Dockerfile"
+                  environment="web"
+                  feedback-link="https://github.com/arunstiwari/docker-workshop-lab">
+    
+      <google-codelab-step label="Introduction" duration="7">
+        <h2 is-upgraded>What is a Dockerfile?</h2>
+<ol type="1">
+<li>A <code>Dockerfile</code> is a text file that contains instructions on how to create a Docker image</li>
+<li><code>Instructions</code> that we write in a <code>Dockerfile</code> is called <code>directives</code></li>
+<li><code>Dockerfile</code> is a mechanism for creating a customer Docker image as per an application requirement</li>
+</ol>
+<h2 is-upgraded>Dockerfile Format</h2>
+<ul>
+<li>The format of a Dockerfile is as follows:</li>
+</ul>
+<pre><code language="language-text" class="language-text"># This is a comment 
+DIRECTIVE argument 
+</code></pre>
+<ul>
+<li>All lines starting with <code>#</code> is a comment</li>
+<li><code>Directive</code> is not case sensitive in Dockerfile, however best practice is write all directives in uppercase.</li>
+<li>A <code>Dockerfile</code> can contain multiple lines of comments and directives. These lines will be executed in order by the <code>Docker Engine</code> while building the Docker image</li>
+<li>If we are using ubuntu versions later than 18.04, there will be a prompt to enter time zone. We can suppress the prompt with argument shown below:</li>
+</ul>
+<pre><code language="language-shell" class="language-shell">DEBIAN_FRONTEND = non_interactive
+</code></pre>
+<h2 is-upgraded>Common Directives in Dockerfile</h2>
+<ul>
+<li>Directive is a command that is used to create a Docker image.</li>
+<li>Let us look at the five important directives <ol type="1">
+<li>The <code>FROM</code> directive<ol type="1">
+<li><code>Dockerfile</code> usually starts with the <code>FROM</code> directive. Used to specify the parent image of our custom Docker image</li>
+<li>A <code>FROM</code> directive has the following format:</li>
+</ol>
+<pre><code language="language-text" class="language-text">FROM &lt;image&gt;:&lt;tag&gt;
+</code></pre>
+<ol type="1" start="3">
+<li>e.g. if we want to build the docker image from ubuntu version 20.04, we can write the FROM directive as</li>
+</ol>
+<pre><code language="language-text" class="language-text">FROM ubuntu:20.04
+</code></pre>
+<ol type="1" start="4">
+<li>If we want to build the docker image from scratch, we can use the following command</li>
+</ol>
+<pre><code language="language-text" class="language-text">FROM scratch
+</code></pre>
+</li>
+<li>The <code>LABEL</code> directive<ol type="1">
+<li>A <code>LABEL</code> is a key-value pair that can be used to add metadata to a Docker image.</li>
+<li>These labels can be used to organize the Docker images properly</li>
+<li>A <code>LABEL</code> directive has the following format:</li>
+</ol>
+<pre><code language="language-text" class="language-text">   LABEL &lt;key&gt;=&lt;value&gt;   
+</code></pre>
+<ol type="1" start="4">
+<li>A Dockerfile can have multiple labels, adhering to the preceding key-value format:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> LABEL maintainer=arunstiwari@gmail.com
+ LABEL version=1.0
+ LABEL environment=dev 
+</code></pre>
+<ol type="1" start="5">
+<li>Labels on an existing Docker image can be viewed with the <code>docker image inspect</code> command</li>
+</ol>
+</li>
+<li>The <code>RUN</code> directive<ol type="1">
+<li>This directive is used to execute the commands during the image build time</li>
+<li>This will create a new layer on top of the existing layer, execute the specified command, and commit the results to the newly created layer</li>
+<li>This directive is used to install the required packages, update the packages, create users and groups, and so on</li>
+<li>The <code>RUN</code> directive has the following format:</li>
+</ol>
+<pre><code language="language-text" class="language-text">   RUN &lt;command&gt;
+</code></pre>
+<ol type="1" start="5">
+<li><code><command></code> specifies the shell command you want to execute as part of the image build process.</li>
+<li>A Dockerfile can have multiple <code>RUN</code> directives adhering to the preceding format</li>
+<li>Following e.g. shows the installation of <code>nginx</code> server</li>
+</ol>
+<pre><code language="language-text" class="language-text"> RUN apt-get update 
+ RUN apt-get install nginx -y 
+</code></pre>
+<ol type="1" start="8">
+<li>We can add multiple shell commands to a single <code>RUN</code> directive by separating them with the <code>&&</code> symbol</li>
+</ol>
+<pre><code language="language-text" class="language-text"> RUN apt-get update &amp;&amp; apt-get install nginx -y
+</code></pre>
+</li>
+<li>The <code>CMD</code> directive<ol type="1">
+<li>This directive is used to provide the default initialization command that will be executed when a container is created from the Docker image</li>
+<li>A Dockerfile can execute only one <code>CMD</code> directive</li>
+<li>If there is more than one <code>CMD</code> directive in the <code>Dockerfile</code>, Docker will execute only the last one</li>
+<li>The <code>CMD</code> directive has the following format:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> CMD [&#34;executable&#34;, &#34;param1&#34;, &#34;param2&#34;, &#34;param3&#34;, ...]
+</code></pre>
+<ol type="1" start="5">
+<li>Following example is used to echo <code>Hello World</code> as the output of a Docker container</li>
+</ol>
+<pre><code language="language-text" class="language-text"> CMD [&#34;echo&#34;, &#34;Hello world&#34;]
+</code></pre>
+<ol type="1" start="6">
+<li>The preceding <code>CMD</code> directive will produce the following output when we run the Docker container with the <code>docker container run <image></code> command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container run &lt;image&gt; echo 
+ &#34;Hello Docker !!!&#34;
+</code></pre>
+<h2 is-upgraded>Difference between RUN and CMD</h2>
+<ol type="1">
+<li>Both the <code>RUN</code> and <code>CMD</code> directives will be used to execute a shell command.</li>
+<li>The main difference between these two directives is that the command provided with the RUN directive will be executed during the image build process, while the command provided with the CMD directive will be executed once a container is launched from the built image</li>
+<li>Dockerfile can have multiple RUN directives, but there can be only one CMD directive.</li>
+<li>If we have multiple CMD directives, then all others except the last one will be ignored.</li>
+<li>RUN directive is used to install a software package during the Docker image build process and the CMD directive is used to start the software package once a container is launched from the built image</li>
+</ol>
+</li>
+<li>The <code>ENTRYPOINT</code> directive<ol type="1">
+<li>This directive is used to provide the default initialization command that will be executed when a container is created from the Docker image</li>
+<li>Difference between <code>CMD</code> and <code>ENTRYPOINT</code> directive is that unlike the CMD directive, we cannot override the <code>ENTRYPOINT</code> command using the command-line parameters sent with the <code>docker container run</code> command</li>
+<li>This directive has the following format:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ENTRYPOINT [&#34;executable&#34;, &#34;param1&#34;, &#34;param2&#34;, &#34;param3&#34;, ...]
+</code></pre>
+<ol type="1" start="4">
+<li><code>Note: The --entrypoint flag can be sent with the docker container run</code> command to override the default ENTRYPOINT of the image</li>
+<li>Following example shows the default command as <code>echo</code> and default parameter as <code>Hello</code> using the <code>ENTRYPOINT</code> directive. We have also provided <code>World</code> as the additional parameter using the <code>CMD</code> directive</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ENTRYPOINT [&#34;echo&#34;, &#34;Hello&#34;]
+ CMD [&#34;World&#34;]
+</code></pre>
+<ol type="1" start="6">
+<li>Now when we run the container, we will get output as</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container run &lt;image&gt;
+ Hello World
+</code></pre>
+<ol type="1" start="7">
+<li>However if we launch the Docker image with additional command line parameters, the output message will be</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container run &lt;image&gt; &#34;Docker&#34;
+ Hello Docker
+</code></pre>
+</li>
+</ol>
+</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Create First Dockerfile" duration="0">
+        <ol type="1">
+<li>Let us create a <code>Dockerfile</code> with the following content</li>
+</ol>
+<pre><code language="language-text" class="language-text"># This is my first Docker image 
+FROM ubuntu 
+LABEL maintainer=arunstiwari@gmail.com
+RUN apt-get update
+CMD [&#34;The Docker workshop&#34;]
+ENTRYPOINT [&#34;echo&#34;, &#34;You are reading&#34;]
+</code></pre>
+<h2 is-upgraded>Docker image</h2>
+<ol type="1">
+<li>A docker image is a binary file consisting of multiple layers based on the instructions provided in the Dockerfile</li>
+<li>These layers are stacked on top of one another, and each layer is dependent on the previous layer</li>
+<li>Each of the layers is a result of the changes from the layer below it</li>
+<li>All the layers of the Docker image are read-only</li>
+<li>Once we create a Docker container from a Docker image, a new writable layer will be created on top of other read-only layers, which will contain all the modifications made to the container filesystem</li>
+<li>The <code>docker image build</code> command will create a Docker image from the Dockerfile. The layers of the Docker image will be mapped to the directives provided in the Dockerfile</li>
+<li>The <code>docker image build</code> command has following format</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker image build &lt;context&gt; 
+</code></pre>
+<ol type="1" start="8">
+<li>Execute the command from the directory where the Dockerfile is located.</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker image build . 
+
+[+] Building 8.0s (6/6) FINISHED                                                                                                                         
+ =&gt; [internal] load build definition from Dockerfile                                                                                                0.0s
+ =&gt; =&gt; transferring dockerfile: 212B                                                                                                                0.0s
+ =&gt; [internal] load .dockerignore                                                                                                                   0.0s
+ =&gt; =&gt; transferring context: 34B                                                                                                                    0.0s
+ =&gt; [internal] load metadata for docker.io/library/ubuntu:latest                                                                                    0.0s
+ =&gt; [1/2] FROM docker.io/library/ubuntu                                                                                                             0.0s
+ =&gt; [2/2] RUN apt-get update                                                                                                                        7.8s
+ =&gt; exporting to image                                                                                                                              0.1s
+ =&gt; =&gt; exporting layers                                                                                                                             0.1s
+ =&gt; =&gt; writing image sha256:4b8edb92cc2d2e4cabe1933c4958496c2524c3761a37f646ae1a39d60897db47          
+</code></pre>
+<ol type="1" start="9">
+<li>Let us look at the <code>list of images</code> using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker image list 
+REPOSITORY                    TAG                IMAGE ID       CREATED              SIZE
+&lt;none&gt;                        &lt;none&gt;             4b8edb92cc2d   About a minute ago   92.8MB
+...
+</code></pre>
+<ol type="1" start="10">
+<li>Let us build the image again using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker image build . 
+
+[+] Building 0.1s (6/6) FINISHED                                                                                                                         
+ =&gt; [internal] load build definition from Dockerfile                                                                                                0.0s
+ =&gt; =&gt; transferring dockerfile: 37B                                                                                                                 0.0s
+ =&gt; [internal] load .dockerignore                                                                                                                   0.0s
+ =&gt; =&gt; transferring context: 32B                                                                                                                    0.0s
+ =&gt; [internal] load metadata for docker.io/library/ubuntu:latest                                                                                    0.0s
+ =&gt; [1/2] FROM docker.io/library/ubuntu                                                                                                             0.0s
+ =&gt; CACHED [2/2] RUN apt-get update                                                                                                                 0.0s
+ =&gt; exporting to image                                                                                                                              0.0s
+ =&gt; =&gt; exporting layers                                                                                                                             0.0s
+ =&gt; =&gt; writing image sha256:4b8edb92cc2d2e4cabe1933c4958496c2524c3761a37f646ae1a39d60897db47  
+</code></pre>
+<ol type="1" start="11">
+<li>This time the <code>image build process</code> was instantaneous and the reason for this is <code>cache</code>.<ol type="1">
+<li>Since we did not change any content of the <code>Dockerfile</code>, the Docker daemon took advantage of the cache and reused the existing layers from the local image cache to accelerate the build process</li>
+<li>We can see that the cache was used this time with the <code>Using cache</code> lines available in the preceding output</li>
+</ol>
+</li>
+<li>Let us tag our image with <code>IMAGE ID 4b8edb92cc2d</code> as <code>my-tagged-image:v1.0</code></li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker image tag 4b8edb92cc2d my-tagged-image:v1.0
+</code></pre>
+<ol type="1" start="13">
+<li>Let us execute the following command to see the image information</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker image list 
+
+REPOSITORY                    TAG                IMAGE ID       CREATED          SIZE
+my-tagged-image               v1.0               4b8edb92cc2d   12 minutes ago   92.8MB
+...
+</code></pre>
+<ol type="1" start="14">
+<li>We can also tag an image during the build process by specifying the -t flag :</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker image build -t my-tagged-image:v2.0 .
+</code></pre>
+<ol type="1" start="15">
+<li>Let us run the container from this image using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker container run my-tagged-image:v1.0 
+
+You are reading The Docker workshop
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Othe Dockerfile Directives" duration="0">
+        <ol type="1">
+<li>Besides the common directives we have seen earlier, there are advanced directives that is used to create more advanced Docker images</li>
+<li>Let us look at the important advanced directives <ol type="1">
+<li>The ENV directive<ol type="1">
+<li>This directive is used to set environment variables</li>
+<li>Environment variables are used by applications and processes to get information about the environment in which a process runs</li>
+<li>One example would be PATH environment variable, which lists the directories to search for executable files</li>
+<li>Environment variables are defined as key-value pairs as per the following format:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ENV &lt;key&gt; &lt;value&gt;
+</code></pre>
+<ol type="1" start="5">
+<li>The <code>PATH</code> environment variable is set with the following value:</li>
+</ol>
+<pre><code language="language-text" class="language-text">  $PATH:/usr/local/myapp/bin/
+</code></pre>
+<ol type="1" start="6">
+<li>Hence, it can be set using the ENV directive as follows:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ENV PATH $PATH:/usr/local/myapp/bin/
+</code></pre>
+<ol type="1" start="7">
+<li>We can set multiple environment variables in the same line separated by spaces. However, in this form, the <code>key</code> and <code>value</code> should be separated by the <code>=</code> symbol:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ENV &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; ...
+</code></pre>
+<ol type="1" start="8">
+<li>Let us set two environment variables using the <code>ENV</code> directive as shown below:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ENV PATH $PATH:/usr/local/myapp/bin/ VERSION=1.0.0
+</code></pre>
+<ol type="1" start="9">
+<li>Once an environment variable is set with the <code>ENV</code> directive in the <code>Dockerfile</code>, this variable is available in all subsequent Docker image layers. <ol type="1">
+<li>This variable is even available in the Docker containers launched from this Docker image</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>The ARG directive<ol type="1">
+<li>This directive is used to define variables that the user can pass at build time.</li>
+<li>This directive is the only directive that can precede the <code>FROM</code> directive in the <code>Dockerfile</code></li>
+<li>Users can pass values using <code>--build-arg <var-name>=<value></code>, as shown here, while building the Docker image</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker image build -t &lt;image&gt;:&lt;tag&gt; --build-arg &lt;varname&gt;=&lt;value&gt; . 
+</code></pre>
+<ol type="1" start="4">
+<li>This directive has the following format:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ARG &lt;varname&gt;
+</code></pre>
+<ol type="1" start="5">
+<li>There can be multiple <code>ARG</code> directives in a <code>Dockerfile</code> as follows:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ARG USER 
+ ARG VERSION 
+</code></pre>
+<ol type="1" start="6">
+<li>The <code>ARG</code> directive can also have an optional default value defined. This default value will be used if no value is passed at build time</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ARG USER=TestUser 
+ ARG VERSION=1.0.0
+</code></pre>
+<ol type="1" start="7">
+<li>Unlike the <code>ENV</code> variables, <code>ARG</code> variables are not accessible from the running container. They are only available during the build process</li>
+<li>Let&#39;s create a Dockerfile with the following content</li>
+</ol>
+<pre><code language="language-text" class="language-text"> # ENV and ARG example
+ ARG TAG=latest
+ FROM ubuntu:$TAG
+ LABEL maintainer=arunstiwari@gmail.com
+ ENV VERSION=1.0 APP_DIR=/usr/local/app/bin
+ CMD [&#34;env&#34;] 
+</code></pre>
+<ol type="1" start="9">
+<li>Let us build the image with the following command as shown below:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $  docker image build -t arg-env-ex --build-arg TAG=19.04 . 
+  [+] Building 13.4s (6/6) FINISHED                                                                                                                        
+  =&gt; [internal] load build definition from Dockerfile                                                                                                0.0s
+  =&gt; =&gt; transferring dockerfile: 191B                                                                                                                0.0s
+  =&gt; [internal] load .dockerignore                                                                                                                   0.0s
+  =&gt; =&gt; transferring context: 34B                                                                                                                    0.0s
+  =&gt; [internal] load metadata for docker.io/library/ubuntu:19.04                                                                                     6.9s
+  =&gt; [auth] library/ubuntu:pull token for registry-1.docker.io                                                                                       0.0s
+  =&gt; [1/1] FROM docker.io/library/ubuntu:19.04@sha256:2adeae829bf27a3399a0e7db8ae38d5adb89bcaf1bbef378240bc0e6724e8344                               6.4s
+  =&gt; =&gt; resolve docker.io/library/ubuntu:19.04@sha256:2adeae829bf27a3399a0e7db8ae38d5adb89bcaf1bbef378240bc0e6724e8344                               0.0s
+  =&gt; =&gt; sha256:a55088cd5dc4ddefb4c30267d79196ee7e0b09ab273696bb32954cdc96c34800 30.81kB / 30.81kB                                                    1.7s
+  =&gt; =&gt; sha256:7f1b9a27d159d75a27bf268dc94e86433ce6c7840992325466a3ab2be6bc01ab 863B / 863B                                                          2.1s
+  =&gt; =&gt; sha256:2adeae829bf27a3399a0e7db8ae38d5adb89bcaf1bbef378240bc0e6724e8344 1.42kB / 1.42kB                                                      0.0s
+  =&gt; =&gt; sha256:e4f396e90bcc1f4487f981b5621414ab8ac9d1a75dd3a1571758ca4e09c6bc32 1.15kB / 1.15kB                                                      0.0s
+  =&gt; =&gt; sha256:0595a5e7607f131088dcf242a8ccef3a2b2f05545e15f15aa66dd277462b734d 3.41kB / 3.41kB                                                      0.0s
+  =&gt; =&gt; sha256:50e8a48a550c9ae0c880412c6c2525816866742e8df3485270f9658865d35f47 26.38MB / 26.38MB                                                    5.4s
+  =&gt; =&gt; sha256:152e29618af7e9bf7b60d7c96ea6570603851e3bafe5b5c05df675a3e2e81b38 187B / 187B                                                          4.8s
+  =&gt; =&gt; extracting sha256:50e8a48a550c9ae0c880412c6c2525816866742e8df3485270f9658865d35f47                                                           0.7s
+  =&gt; =&gt; extracting sha256:a55088cd5dc4ddefb4c30267d79196ee7e0b09ab273696bb32954cdc96c34800                                                           0.0s
+  =&gt; =&gt; extracting sha256:7f1b9a27d159d75a27bf268dc94e86433ce6c7840992325466a3ab2be6bc01ab                                                           0.0s
+  =&gt; =&gt; extracting sha256:152e29618af7e9bf7b60d7c96ea6570603851e3bafe5b5c05df675a3e2e81b38                                                           0.0s
+  =&gt; exporting to image                                                                                                                              0.0s
+  =&gt; =&gt; exporting layers                                                                                                                             0.0s
+  =&gt; =&gt; writing image sha256:fc09d4ae4a937076d1b98a05cc6cacac9fb40f5e7f93f9712ca0f7895f2044a4                                                        0.0s
+  =&gt; =&gt; naming to docker.io/library/arg-env-ex     
+</code></pre>
+<ol type="1" start="10">
+<li>Here while building the image we have overridden the value of <code>Build args</code></li>
+<li>Next let us run the container with the following command:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">  $ docker container run arg-env-ex 
+   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+   HOSTNAME=7838ea6cf39a
+   VERSION=1.0
+   APP_DIR=/usr/local/app/bin
+   HOME=/root
+</code></pre>
+<ol type="1" start="12">
+<li>Let us override the ENV variable while running the container. Use the following command to run the container</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container run -e VERSION=1.1 arg-env-ex
+   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+   HOSTNAME=7838ea6cf39a
+   VERSION=1.1
+   APP_DIR=/usr/local/app/bin
+   HOME=/root 
+</code></pre>
+</li>
+<li>The WORKDIR directive<ol type="1">
+<li>This directive is used to specify the current working directory of the Docker container</li>
+<li>Any subsequent <code>ADD, CMD, COPY, ENTRYPOINT and RUN</code> directives will be executed in this directory</li>
+<li>This directive has the following format:</li>
+</ol>
+<pre><code language="language-text" class="language-text">  WORKDIR /path/to/workdir
+</code></pre>
+<ol type="1" start="4">
+<li>If this specified directory does not exist, Docker will create this directory and make it the current working directory, which means this directive executes both the <code>mkdir</code> and <code>cd</code> commands implicitly</li>
+<li>There can be multiple <code>WORKDIR</code> directives in the Dockerfile. If a relative path is provided in a subsequent <code>WORKDIR</code> directive, that will be relative to the working directory set by the previous <code>WORKDIR</code> directive</li>
+</ol>
+<pre><code language="language-text" class="language-text"> WORKDIR /one
+WORKDIR two
+WORKDIR three
+RUN pwd 
+</code></pre>
+<ol type="1" start="6">
+<li>The output of the <code>pwd</code> command will be <code>/one/two/three</code></li>
+</ol>
+</li>
+<li>The COPY directive<ol type="1">
+<li>This directive is used to copy files and folders from the local filesystem to the Docker image during the build process</li>
+<li>This directive takes two arguments - the first one is the <code>source path</code> from the local filesystem, and the second one is the <code>destination path</code> on the image filesystem</li>
+</ol>
+<pre><code language="language-text" class="language-text"> COPY &lt;source&gt; &lt;destination&gt;
+</code></pre>
+<ol type="1" start="3">
+<li>Wildcards can also be specified to copy all files that match the given pattern. E.g. is shown below</li>
+</ol>
+<pre><code language="language-text" class="language-text"> COPY *.html /var/www/html/
+</code></pre>
+<ol type="1" start="4">
+<li>In addition to copying files, the <code>--chown</code> flag can be used with the <code>COPY</code> directive to specify the user and group ownership of the files</li>
+</ol>
+<pre><code language="language-text" class="language-text"> COPY  --chown=myuser:mygroup *.html /var/www/html/
+</code></pre>
+</li>
+<li>The ADD directive<ol type="1">
+<li>This directive is similar to the <code>COPY</code> directive and has the following format:</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ADD &lt;source&gt; &lt;destination&gt;
+</code></pre>
+<ol type="1" start="2">
+<li>In addition to the functionality provided by the <code>COPY</code> directive, the <code>ADD</code> directive also allows us to use <code>URL</code> as the  parameter</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ADD http://sample.com/test.txt /tmp/test.txt 
+</code></pre>
+<ol type="1" start="3">
+<li>In the last example, the <code>ADD</code> directive will download the <code>test.txt</code> file from the url and <code>copy</code> it to the target directory</li>
+<li>Another feature of the <code>ADD</code> directive is automatically extracting the compressed files. If we add a compressed file (gzip, bzip2, tar and so on) to the <code><source></code> parameter, the <code>ADD</code> directive will extract the archive and copy the content to the image filesystem</li>
+</ol>
+<pre><code language="language-text" class="language-text"> ADD html.tar.gz /var/www/html 
+</code></pre>
+<ol type="1" start="5">
+<li>Exercise: Let us deploy custom HTML files to the Apache Web server. <ol type="1">
+<li>We will use <code>Ubuntu</code> as the base image and install Apache on top of it</li>
+<li>Next we will copy our index.html to the Docker imag eand download the docker logo from the https://www.docker.com website to be used with the custom index.html file</li>
+<li>Let us create a new directory <code>exercise-1</code> and create an <code>index.html</code> file in it</li>
+<li>The content of the <code>index.html</code> file is as below:</li>
+</ol>
+<pre><code language="language-html" class="language-html">&lt;html&gt;
+ &lt;body&gt;
+  &lt;h1&gt;Welcome to Docker workshop&lt;/h1&gt;
+  &lt;img src=&#34;logo.png&#34; height=&#34;350&#34; width=&#34;500&#34;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<ol type="1" start="5">
+<li>Next create <code>Dockerfile</code> with the following content:</li>
+</ol>
+<pre><code language="language-text" class="language-text"># WORKDIR, COPY and ADD example 
+FROM ubuntu:latest
+ENV DEBIAN_FRONTEND noninteractive 
+RUN apt-get update &amp;&amp; apt-get install apache2 -y 
+WORKDIR /var/www/html/
+COPY index.html . 
+ADD https://www.docker.com/sites/default/files/d8/2019-07/Moby-logo.png ./logo.png 
+CMD [&#34;ls&#34;]
+</code></pre>
+<ol type="1" start="6">
+<li>Let us build the docker image using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker image build -t copy-add-ex .
+</code></pre>
+<ol type="1" start="7">
+<li>Next run the docker image using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container run copy-add-ex 
+</code></pre>
+<ol type="1" start="8">
+<li>From the output we can see that both the <code>index.html</code> and <code>logo.png</code> files are available in the <code>/var/www/html/</code> directory</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>The USER directive<ol type="1">
+<li>Docker will use the <code>root</code> user as the default user of a Docker container</li>
+<li>We can use the <code>USER</code> directive to change this default behaviour and specify a <code>non-root</code> user as the default <code>user</code> of a Docker container</li>
+<li>Running the container as <code>non-root user</code> improves the security of the container</li>
+<li>The username specified with the <code>USER</code> directive will be used to run all the subsequent <code>RUN, CMD and ENTRYPOINT</code> directives in the Dockerfile</li>
+<li>This directive takes the following format:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> USER &lt;user&gt;
+</code></pre>
+<ol type="1" start="6">
+<li>In addition to the <code>username</code> we can also specify the optional <code>group</code> name to run the Docker container</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> USER &lt;user&gt;:&lt;group&gt;
+</code></pre>
+<ol type="1" start="7">
+<li>We need to make sure that the <code><user></code> and the <code><group></code> values are valid user and group names</li>
+<li>Exercise: Create a Docker image to run the Apache web server. The container should run as a non-root user due to security reasons. <ol type="1">
+<li>Step 1: Use <code>USER</code> directive in the <code>Dockerfile</code> to set the default user</li>
+<li>Step 2: Install the <code>Apache web server</code> and change the user to <code>wwww-data</code> (Note: www-data user is the default user for the Apache web server on Ubuntu)</li>
+<li>Step 3: Finally execute the <code>whoami</code> command to verify the current user by printing the <code>username</code></li>
+</ol>
+</li>
+<li>Solution: <ol type="1">
+<li>Create a <code>Dockerfile</code> as shown below:</li>
+</ol>
+<pre><code language="language-text" class="language-text"># USER directive example
+ ARG TAG=lates 
+FROM ubuntu:$TAG
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update &amp;&amp; apt-get install apache2 -y
+WORKDIR /var/www/html/
+USER www-data
+CMD [&#34;whoami&#34;]
+</code></pre>
+<ol type="1" start="2">
+<li>Next let us build the docker image using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker image build -t user-ex .
+[+] Building 0.1s (7/7) FINISHED                                                                                                                         
+=&gt; [internal] load build definition from Dockerfile                                                                                                0.0s
+=&gt; =&gt; transferring dockerfile: 236B                                                                                                                0.0s
+=&gt; [internal] load .dockerignore                                                                                                                   0.0s
+=&gt; =&gt; transferring context: 2B                                                                                                                     0.0s
+=&gt; [internal] load metadata for docker.io/library/ubuntu:latest                                                                                    0.0s
+=&gt; [1/3] FROM docker.io/library/ubuntu:latest                                                                                                      0.0s
+=&gt; CACHED [2/3] RUN apt-get update &amp;&amp; apt-get install apache2 -y                                                                                   0.0s
+=&gt; CACHED [3/3] WORKDIR /var/www/html/                                                                                                             0.0s
+=&gt; exporting to image                                                                                                                              0.0s
+=&gt; =&gt; exporting layers                                                                                                                             0.0s
+=&gt; =&gt; writing image sha256:2142d353f834cdf8d569681b5339dcb05539178835ae05a50585beaa8a6ae5ce                                                        0.0s
+=&gt; =&gt; naming to docker.io/library/user-ex          
+</code></pre>
+<ol type="1" start="3">
+<li>Run the container using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container run user-ex
+ www-data  
+</code></pre>
+</li>
+</ol>
+</li>
+<li>The VOLUME directive<ol type="1">
+<li>In Docker, the data (for example, files, executables, etc.) generated and used by Docker containers will be stored within the container filesystem.</li>
+<li>When we delete the container, all the data will be lost</li>
+<li>This issue can be resolved by using the concept of <code>Volumes</code></li>
+<li><code>Volumes</code> are used to persist the data and share the data between containers</li>
+<li>The <code>VOLUME</code> directive is used within <code>Dockerfile</code> to create Docker volumes.</li>
+<li>Once a <code>VOLUME</code> is created in the Docker container, a mapping directory will be created in the underlying host machine.</li>
+<li>All the file changes to the volume mount of the Docker container will be copied to the mapped directory of the host machine</li>
+<li>The <code>VOLUME</code> directive generally takes a JSON array as the parameter:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> VOLUME [&#34;/path/to/volume&#34;]
+</code></pre>
+<ol type="1" start="9">
+<li>We can specify the plain string with multiple paths:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">VOLUME /path/to/volume1 /path/to/volume2
+</code></pre>
+<ol type="1" start="10">
+<li>Exercise: Create a Docker container to run the Apache web server. Provision a mechanism to store the log files so that we do not loose the Apache log files in case of Docker container failure</li>
+<li>Solution: <ol type="1">
+<li>Step 1: Persist the log files by mounting the Apache log path to the underlying Docker host</li>
+<li>Step 2: Create a Dockerfile as shown below:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> # VOLUME directive example
+ARG TAG=latest
+FROM ubuntu:$TAG
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update &amp;&amp; apt-get install apache2 -y
+WORKDIR /var/www/html/
+VOLUME [&#34;/var/log/apache2&#34;]
+CMD [&#34;whoami&#34;]
+</code></pre>
+<ol type="1" start="3">
+<li>Step 3: Build the Docker image</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker image build -t volume-ex .
+</code></pre>
+<ol type="1" start="4">
+<li>Step 4: Run the container</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">$ docker container run -i --tty --name volume-ex volume-ex /bin/bash 
+</code></pre>
+<ol type="1" start="5">
+<li>Next navigate to the <code>/var/log/apache2</code> directory as shown below:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container run -i --tty --name volume-ex volume-ex /bin/bash 
+root@d2a58435e9e3:/var/www/html# cd /var/log/apache2/
+root@d2a58435e9e3:/var/log/apache2# ls -l
+total 0
+-rw-r----- 1 root adm 0 Dec 30 11:47 access.log
+-rw-r----- 1 root adm 0 Dec 30 11:47 error.log
+-rw-r----- 1 root adm 0 Dec 30 11:47 other_vhosts_access.log
+</code></pre>
+<ol type="1" start="6">
+<li>Inspect <code>volume container volume-ex</code> to view the mount information</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container inspect volume-ex 
+...
+  &#34;Mounts&#34;: [
+  {
+      &#34;Type&#34;: &#34;volume&#34;,
+      &#34;Name&#34;: &#34;bbe0d4c414d1c07f4b8fed5c285a9740827cb9e70c1e3f0f59835ad67bb222b7&#34;,
+      &#34;Source&#34;: &#34;/var/lib/docker/volumes/bbe0d4c414d1c07f4b8fed5c285a9740827cb9e70c1e3f0f59835ad67bb222b7/_data&#34;,
+      &#34;Destination&#34;: &#34;/var/log/apache2&#34;,
+      &#34;Driver&#34;: &#34;local&#34;,
+      &#34;Mode&#34;: &#34;&#34;,
+      &#34;RW&#34;: true,
+      &#34;Propagation&#34;: &#34;&#34;
+  }
+],
+
+...
+</code></pre>
+<ol type="1" start="7">
+<li>We can see the container is mounted to the host path of &#34;/var/lib/docker/volumes/bbe0d4c414d1c07f4b8fed5c285a9740827cb9e70c1e3f0f59835ad67bb222b7/_data&#34;, which is defined as the <code>Mountpoint</code> field in the preceding output</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>The EXPOSE directive<ol type="1">
+<li>This directive is used to inform Docker that the container is listening on the specified ports a runtime</li>
+<li>We can use the <code>EXPOSE</code> directive to expose ports through either TCP or UDP protocols.</li>
+<li>This directive has the following format:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ EXPOSE &lt;port&gt;
+</code></pre>
+<ol type="1" start="4">
+<li>However, the ports exposed with the <code>EXPOSE</code> directive will only be accessible from within the other Docker containers.</li>
+<li>To expose these ports outside the Docker container, we can publish the ports with the <code>-p</code> flag with the <code>docker container run</code> command:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container run -p &lt;host_port&gt;:&lt;container_port&gt; &lt;image&gt;
+</code></pre>
+<ol type="1" start="6">
+<li>Exercise: Imagine that we have two containers. <ol type="1">
+<li>One is a NodeJS web app container that should be accessed from outside via port 80.</li>
+<li>The second one is the MySQL container, which should be accessed from the node app container via port 3306.</li>
+<li>In this scenario, we have to expose port 80 of the NodeJS app with the <code>EXPOSE</code> directive and use the <code>-p</code> flag with the <code>docker container run</code> command to expose it externally.</li>
+<li>However, for the MySQL container, we can only use the <code>EXPOSE</code> directive without the <code>-p</code> flag when running the container, as <code>3306</code> should only be accessible from the node app container</li>
+<li>In summary, the following statements define this directive: <ol type="1">
+<li>If we specify both the <code>EXPOSE</code> directive and <code>-p</code> flag, exposed ports will be accessible from other containers as well as externally</li>
+<li>If we specify <code>EXPOSE</code> directive without the <code>-p</code> flag, exposed ports will be accessible from other containers, but not externally</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Solution: 1.</li>
+</ol>
+</li>
+<li>The HEALTHCHECK directive<ol type="1">
+<li><code>Health checks</code> are used in <code>Docker</code> to check whether the containers are running healthily.</li>
+<li>We can use <code>health checks</code> to make sure the application is running within the Docker container.</li>
+<li>Unless there is a health check specified, there is no way for Docker to say whether a container is healthy.</li>
+<li><code>HEALTHCHECK</code> directive has the following format:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> HEALTHCHECK [OPTIONS] CMD command
+</code></pre>
+<ol type="1" start="5">
+<li>There can be only one <code>HEALTHCHECK</code> directive in a <code>Dockerfile</code>. If there is more than one <code>HEALTHCHECK</code> directive, only the last one will take effect.</li>
+<li>As an example, we can use the following directive to ensure that the container can receive traffic on the <code>http://localhost/</code> endpoint</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> HEALTHCHECK CMD curl -f http://localhost/ || exit 1 
+</code></pre>
+<ol type="1" start="7">
+<li>The <code>exit</code> code at the end of the preceding command is used to specify the health status of the container. <code>O</code> and <code>1</code> are valid values for this field <ol type="1">
+<li>O is used to denote a healthy container</li>
+<li>1 is used to denote an unhealthy container</li>
+</ol>
+</li>
+<li>We can specify the other parameters with the <code>HEALTHCHECK</code> directive, as follows: <ol type="1">
+<li><code>--interval:</code>  This specifies the period between each health check (the default is 30s)</li>
+<li><code>--timeout:</code>  If no success response is received within this period, the health check is considered failed (the default is 30s)</li>
+<li><code>--start-period:</code>  The duration to wait before running the first health check. This is used to give a startup time for the container (the default is 0s)</li>
+<li><code>--retries:</code>  The container will be considered unhealthy if the health check failed consecutively for the given number of retries (the default is 3)</li>
+</ol>
+</li>
+<li>Let us look at the <code>HEALTHCHECK</code> directive example</li>
+</ol>
+<pre><code language="language-shell" class="language-shell">HEALTHCHECK --interval=1m --timeout=2s --start-period=2m --retries=3 CMD curl -f http://localhost/ || exit 1  
+</code></pre>
+<ol type="1" start="10">
+<li>Exercise: We need to dockerize the Apache web server to access the Apache home page from the web browser. Additionally, he has asked you to configure health checks to determine the health status of the Apache web server.</li>
+<li>Solution: <ol type="1">
+<li>Create a Dockerfile as shown below</li>
+<li>Build the Docker image using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker image build -t healthcheck-expose-ex . 
+</code></pre>
+<ol type="1" start="3">
+<li>Run the container using the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container run --rm -p 80:80 --name healthcheck-expose-ex -d healthcheck-expose-ex
+</code></pre>
+<ol type="1" start="4">
+<li>Execute the following command</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container list 
+CONTAINER ID   IMAGE                   COMMAND                  CREATED         STATUS                            PORTS                NAMES
+31edc71f268e   healthcheck-expose-ex   &#34;apache2ctl -D FOREG...&#34;   5 seconds ago   Up 4 seconds (health: starting)   0.0.0.0:80-&gt;80/tcp   healthcheck-expose-ex
+
+</code></pre>
+<ol type="1" start="5">
+<li>Execute the following command again</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> $ docker container list 
+ CONTAINER ID   IMAGE                   COMMAND                  CREATED         STATUS                            PORTS                NAMES
+ 31edc71f268e   healthcheck-expose-ex   &#34;apache2ctl -D FOREG...&#34;   30 seconds ago   Up 29 seconds (healthy)   0.0.0.0:80-&gt;80/tcp   healthcheck-expose-ex
+
+</code></pre>
+<ol type="1" start="6">
+<li>fdfd</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>The ONBUILD directive<ol type="1">
+<li>This directive is used in the <code>Dockerfile</code> to create a reusable Docker image that will be used as the base for another <code>Docker image</code></li>
+<li>As an example, we can create a Docker image that contains all the pre-requisites such as dependencies and configurations, in order to run an application</li>
+<li>Next we can use the pre-requisites image as the parent image to run the application</li>
+<li>While creating the pre-requisites image, we can use the <code>ONBUILD</code> directive, which will include the instructions that should only be executed when this image is used as the parent image in another <code>Dockerfile</code></li>
+<li><code>ONBUILD</code> instructions will not be executed while building the <code>Dockerfile</code> that contains the <code>ONBUILD</code> directive, but only when building the child image</li>
+<li>The <code>ONBUILD</code> directive takes the following format:</li>
+</ol>
+<pre><code language="language-shell" class="language-shell"> ONBUILD &lt;instruction&gt;
+</code></pre>
+<ol type="1" start="7">
+<li>fdfh</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>

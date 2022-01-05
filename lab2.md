@@ -117,4 +117,16 @@ $ docker rmi <image_id>
 $ docker system prune -fa 
 ```
 
-
+## Attaching to an Existing Container
+1. The docker `attach` command is used to attach to a running container in the context of the `primary process` 
+2. Let us use the `docker attach` command to attach to a running containers and investigate the main container `entrypoint` process directly 
+```shell
+$ docker run -itd --name attach-example1 ubuntu:latest
+```
+3. Run the `docker attach` command to attach to the primary process (which in this case is /bin/bash)
+```shell
+$ docker attach attach-example1
+```
+4. To detach from the primary process, we should not use the `exit` command as it will result in stopping the container instance 
+   1. We should use the docker shortcut like `Ctrl + P and then Ctrl + Q` to gracefully detach from an `attach` session 
+5. `docker attach` command differs from the `docker exec` command in a way that `exec` command executes a new process inside a running container, whereas `attach` command attaches to the main process of a container directly 
