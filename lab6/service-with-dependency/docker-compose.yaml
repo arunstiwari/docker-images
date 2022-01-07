@@ -1,0 +1,12 @@
+version: "3"
+services:
+  init:
+    image: busybox:latest
+  pre:
+    image: busybox:latest
+    depends_on:
+      - "init"
+  main:
+    image: busybox:latest
+    depends_on:
+      - "pre"
