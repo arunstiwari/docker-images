@@ -41,3 +41,30 @@ jenkins:
             securityGroups: ${AGENT_SECURITY_GROUP_ID}
             subnets: ${SUBNET_IDS}
             templateName: jenkins-agent
+
+    - ecs:
+        credentialsId: ''
+        cluster: ${ECS_AGENT_CLUSTER}
+        name: ecs-cloud-nodejs
+        regionName: ${AWS_REGION}
+        jenkinsUrl: ${JENKINS_URL}
+        tunnel: ${PRIVATE_JENKINS_HOST_AND_PORT}
+        templates:
+          - assignPublicIp: true
+            cpu: 1024
+            executionRole: ${AGENT_EXECUTION_ROLE_ARN}
+            image: arunstiwari/jenkins-slaves:nodejs
+            label: ecs-nodejs
+            launchType: FARGATE
+            logDriver: awslogs
+            logDriverOptions:
+              - name: awslogs-group
+                value: ${LOG_GROUP_NAME}
+              - name: awslogs-region
+                value: ${AWS_REGION}
+              - name: awslogs-stream-prefix
+                value: jenkins-agent
+            memoryReservation: 2048
+            securityGroups: ${AGENT_SECURITY_GROUP_ID}
+            subnets: ${SUBNET_IDS}
+            templateName: jenkins-agent

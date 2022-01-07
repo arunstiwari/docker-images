@@ -6,3 +6,4 @@ git-server:1.10
 gradle:1.37.1
 blueocean:1.25.2
 docker-plugin:1.2.6
+warnings-ng:9.10.2
