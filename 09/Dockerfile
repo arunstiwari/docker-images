@@ -34,5 +34,5 @@ RUN   mkdir -p ${AGENT_WORKDIR}
 ENV JAVA_HOME "/usr/lib/jvm/java-1.8-openjdk/"
 VOLUME ${AGENT_WORKDIR}
 
-#CMD [ "java","-jar","agent.jar","-jnlpUrl",${jnlpUrl},"-workDir",${AGENT_WORKDIR} ]
+#CMD [ "java","-jar","agent.jar","-jnlpUrl",${jnlpUrl},"-workDir",${AGENT_WORKDIR},"-secret",${secret} ]
 CMD ${JAVA_HOME}/bin/java -jar agent.jar -jnlpUrl ${jnlpUrl} -workDir ${AGENT_WORKDIR} -secret ${secret}
