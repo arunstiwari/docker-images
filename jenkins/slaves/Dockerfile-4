@@ -1,0 +1,15 @@
+ARG BASE_IMAGE=jenkins/inbound-agent
+ARG BASE_IMAGE_VERSION=alpine
+FROM $BASE_IMAGE:$BASE_IMAGE_VERSION
+LABEL maintainer=DevOpsTeam
+LABEL DESCRIPTION="Base Image for NodeJS"
+ARG user=jenkins
+ENV NODEJS_VERSION "v13.0.1"
+
+USER root
+RUN apk update all && apk add py-pip git zip unzip curl coreutils openssl wget
+RUN wget https://nodejs.org/dist/${NODEJS_VERSION}/node-${NODEJS_VERSION}-linux-x64.tar.xz && tar -xJf node-${NODEJS_VERSION}-linux-x64.tar.xz -C /usr/local --strip-components=1 && ln -s /usr/local/bin/node /usr/local/bin/nodejs
+RUN mkdir /.aws && chmod -R 777 /.aws && git config --global http.sslVerify false
+
+USER ${user}
+ENTRYPOINT ["/usr/local/bin/jenkins-agent"]
