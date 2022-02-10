@@ -110,3 +110,146 @@ CONTAINER ID   IMAGE                           COMMAND                  CREATED 
 
 ## Creating and Scaling a stateless service, NGINX
 ### 
+## Git Branch
+### Introduction
+1. A branch is the fundamental means of launching a separate line of development within a software project.
+2. Often, a branch is reconciled and merged with other branches to reunite disparate efforts.
+
+### Creating a branch
+1. To create a branch, use the following command
+```shell
+$ git branch <branch_name> [starting_commit]
+```
+2. If you do not specify a `starting_commit`, then the branch will be created from the `HEAD` of the current branch
+3. sds
+
+### Listing a branch
+1. The `git branch` commands lists branch names found in the repository
+```shell
+$ git branch 
+```
+2. Following command show more detailed output than `git branch`
+```shell
+$ git show-branch 
+```
+3. If you want to see the commit history for the branch `branch1` and `branch2` you can use the following command
+```shell
+$ git show-branch branch1 branch2
+```
+### Checking out Branches
+1. `git checkout` is used to start working on a different branch
+2. `git checkout` makes the branch the new, current working branch
+   1. It changes your working tree file and directory structure to match the state of a given branch
+3. Checkout out to the existing branch `development` using the following command
+```shell
+$ git checkout development
+```
+#### Creating and checking out new branch
+4. If we use the command `git checkout -b development` then if the branch `development` is not existing, then this branch gets created
+5. Generic format for `git checkout` command
+```shell
+$ git checkout -b new-branch start-point 
+```
+6. fdf
+
+### Detached HEAD branches
+1. It is advisable to check out only the tip of a branch by naming the branch directly.
+   1. By default, `git checkout` changes to the tip of a desired branch
+2. When we checkout any commit, git creates a sort of anonymous branch for you called a `detached HEAD`
+3. Git creates a detached HEAD when you:
+   1. Check out a commit that is not the head of a branch
+   2. To find out if you are on a detached `HEAD`, just ask
+   ```shell
+    $ git branch 
+    * (no branch )
+    master 
+    ```
+
+### Deleting a branch
+1. The command `git branch -d branch ` removes the named branch from a repository
+2. Git prevents you from removing the current branch
+```shell
+$ git branch -d bug/issue-123
+error: Cannot delete the branch 'bug/issue-123' which you are currently on.
+```
+
+## Merge Examples
+### Merge two branches
+1. Let us think about merging the branch `branch1` into `branch2`
+   1. Step 1 : First checkout the `branch2` using the following command
+   ```shell
+    $ git checkout branch2 
+    ```
+   2. Step 2 : Next merge the `branch1` into `branch2` using the following command
+   ```shell
+    $ git merge branch1 
+    ```
+
+### Merge with Conflicts
+1. On the master branch, create a new version of file with a few additional lines in it and then commit the changes:
+```shell
+$ git checkout master
+
+$ cat >> file
+Line 5 stuff
+Line 6 stuff
+^D
+
+$ git commit -a -m "Add line 5 and 6"
+Created commit 4d8b599: Add line 5 and 6
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+```
+2. Now, on the alternate branch, modify the same file differently. Whereas you made new commits to the master branch, the alternate branch has not progressed yet.
+```shell
+    $ git checkout alternate
+    Switched branch "alternate"
+
+    $ git show-branch
+    * [alternate] Add alternate's line 4
+     ! [master] Add line 5 and 6
+    --
+     + [master] Add line 5 and 6
+    *+ [alternate] Add alternate's line 4
+
+    # In this branch, "file" left off with "Line 4 alternate stuff"
+
+    $ cat >> file
+    Line 5 alternate stuff
+    Line 6 alternate stuff
+    ^D
+
+    $ cat file
+    Line 1 stuff
+    Line 2 stuff
+    Line 3 stuff
+    Line 4 alternate stuff
+    Line 5 alternate stuff
+    Line 6 alternate stuff
+
+    $ git diff
+    diff --git a/file b/file
+    index a29c52b..802acf8 100644
+    --- a/file
+    +++ b/file
+    @@ -2,3 +2,5 @@ Line 1 stuff
+     Line 2 stuff
+     Line 3 stuff
+     Line 4 alternate stuff
+    +Line 5 alternate stuff
+    +Line 6 alternate stuff
+
+    $ git commit -a -m "Add alternate line 5 and 6"
+    Created commit e306e1d: Add alternate line 5 and 6
+     1 files changed, 2 insertions(+), 0 deletions(-)
+```
+3. Let us review the scenario. The current branch history looks like this
+```shell
+    $ git show-branch
+    * [alternate] Add alternate line 5 and 6
+     ! [master] Add line 5 and 6
+    --
+    *  [alternate] Add alternate line 5 and 6
+     + [master] Add line 5 and 6
+    *+ [alternate^] Add alternate's line 4
+```
+4. To continue, checkout `master` 
